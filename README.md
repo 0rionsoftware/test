@@ -42,6 +42,9 @@ converts.
 { "error": "Too many attempts. Try again in a minute." }
 ```
 
+A `503` means the deployment has no `DATABASE_URL`. The API refuses the signup rather
+than accepting one it cannot store — see [Set a database](#1-set-a-database).
+
 ### `GET /api/waitlist`
 
 Returns `{ "count": 42 }`. The hero uses it for social proof, but only renders the
@@ -63,11 +66,17 @@ number at all. Below the threshold it falls back to a positioning line.
 
 ### 1. Set a database
 
-The file store is **not** safe on serverless — the filesystem is ephemeral and
-per-instance, so signups would be silently lost. Set `DATABASE_URL` to any Postgres
+**Required — the waitlist is inert without it.** Set `DATABASE_URL` to any Postgres
 connection string (Neon, Supabase, Vercel Postgres, RDS, self-hosted) and the app
 switches over automatically. The `waitlist` table is created on first write, so there is
 no migration step.
+
+The local JSON file store is a development convenience only. On serverless the
+filesystem is ephemeral and per-instance, so using it in production would accept a
+signup, report success, and lose the row. Rather than do that, `getStore()` throws in
+production when no connection string is set and the endpoint returns a `503` telling the
+visitor to email instead. Set the variable and the endpoint starts working immediately —
+no code change.
 
 To read your signups:
 
@@ -80,14 +89,20 @@ SELECT email, company, source, created_at FROM waitlist ORDER BY created_at;
 Set `RESEND_API_KEY` and `RESEND_FROM`. Until both are set, the send is skipped and
 signups still succeed. Copy lives in `src/lib/waitlist/notify.ts`.
 
-### 3. Replace the placeholder content
+### 3. Content you still own
 
-These are **invented numbers, written to be replaced** — do not ship them as-is:
+The page deliberately contains **no statistics and no prices**, because inventing either
+pre-launch is worse than omitting them. What's left for you:
 
-- `src/components/sections/problem.tsx` — the three "cost of the gap" stats. Substitute
-  figures you can source and cite.
-- `src/components/sections/engagement.tsx` — all pricing.
+- `src/components/sections/engagement.tsx` — describes the *shape* of each commercial
+  stage ("Fixed fee", "Fixed price", "Flat monthly"). Add a `price` field per stage once
+  you've set real rates.
 - `src/lib/site.ts` — domain, contact email, social handles.
+- `src/components/sections/faq.tsx` — the data-handling answer commits you to not
+  training on client data and to working inside their cloud accounts. Keep it only if
+  you'll honour it.
+
+If you later add stats to `problem.tsx`, cite them.
 
 ### 4. Point at your domain
 

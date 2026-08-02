@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { sendWelcomeEmail } from "@/lib/waitlist/notify";
 import { clientKey, rateLimit, sweep } from "@/lib/waitlist/rate-limit";
 import { isDisposable, normalizeEmail, signupSchema } from "@/lib/waitlist/schema";
-import { getStore } from "@/lib/waitlist/store";
+import { getStore, NoDurableStoreError } from "@/lib/waitlist/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -65,6 +65,19 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, position, alreadyJoined: !created });
   } catch (error) {
+    if (error instanceof NoDurableStoreError) {
+      console.error(
+        "[waitlist] Signup rejected: DATABASE_URL is not set on this deployment.",
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Our waitlist isn't accepting signups just yet. Email us and we'll add you by hand.",
+        },
+        { status: 503 },
+      );
+    }
+
     console.error("[waitlist] Signup failed:", error);
     return NextResponse.json(
       { error: "Something went wrong on our end. Try again in a moment." },
@@ -77,6 +90,8 @@ export async function GET() {
   try {
     return NextResponse.json({ count: await getStore().count() });
   } catch (error) {
+    // Includes the no-database case: report zero so the page renders its
+    // fallback copy instead of a broken social-proof number.
     console.error("[waitlist] Count failed:", error);
     return NextResponse.json({ count: 0 });
   }

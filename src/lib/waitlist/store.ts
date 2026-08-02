@@ -119,6 +119,16 @@ class FileStore implements WaitlistStore {
   }
 }
 
+/** Thrown when the app is running in production with nowhere durable to write. */
+export class NoDurableStoreError extends Error {
+  constructor() {
+    super(
+      "No DATABASE_URL configured. Refusing to accept signups that would be lost.",
+    );
+    this.name = "NoDurableStoreError";
+  }
+}
+
 let cached: WaitlistStore | null = null;
 
 export function getStore(): WaitlistStore {
@@ -127,14 +137,17 @@ export function getStore(): WaitlistStore {
   const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
   if (url) {
     cached = new PostgresStore(url);
-  } else {
-    if (process.env.NODE_ENV === "production") {
-      console.warn(
-        "[waitlist] No DATABASE_URL set — falling back to the local file store. " +
-          "Signups will NOT persist on serverless hosts. Set DATABASE_URL before launch.",
-      );
-    }
-    cached = new FileStore();
+    return cached;
   }
+
+  // The file store is a development convenience. On a serverless host the
+  // filesystem is ephemeral and per-instance, so falling back to it in
+  // production would accept a signup, report success, and lose the row.
+  // Failing loudly is the only honest option.
+  if (process.env.NODE_ENV === "production") {
+    throw new NoDurableStoreError();
+  }
+
+  cached = new FileStore();
   return cached;
 }

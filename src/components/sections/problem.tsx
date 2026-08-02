@@ -1,22 +1,22 @@
+import { GitBranch, UserX, Wrench } from "lucide-react";
+
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
-// PLACEHOLDER FIGURES — replace with numbers you can source and cite before
-// this page goes live. Unsourced stats on a landing page are a liability.
-const costs = [
+const failures = [
   {
-    stat: "18 hrs",
-    label: "per employee, per week",
-    body: "Time spent moving data between systems that were never designed to talk to each other.",
+    icon: GitBranch,
+    title: "The exceptions win",
+    body: "The demo runs on the happy path. Your actual process is a thicket of special cases, and the automation meets all of them in week one.",
   },
   {
-    stat: "6–9 mo",
-    label: "typical internal build",
-    body: "What it takes an in-house team to ship an automation that survives contact with real edge cases.",
+    icon: UserX,
+    title: "Nobody owns it",
+    body: "The pilot ships, the champion moves to the next priority, and within a quarter nobody can say whether it's still working or who to ask.",
   },
   {
-    stat: "70%",
-    label: "of pilots never ship",
-    body: "AI proofs-of-concept that demo well, then die because nobody owns them after launch week.",
+    icon: Wrench,
+    title: "It rots quietly",
+    body: "A vendor changes an API. Your process changes. Volume triples. Nothing errors loudly — the output just gets worse until someone notices.",
   },
 ];
 
@@ -39,14 +39,21 @@ export function Problem() {
         </Reveal>
 
         <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-xl border border-base-800 bg-base-800 sm:grid-cols-3">
-          {costs.map((cost) => (
-            <RevealItem key={cost.stat} className="bg-base-950 p-8">
-              <p className="font-mono text-3xl font-medium text-brass-400">{cost.stat}</p>
-              <p className="mt-1 text-sm text-base-400">{cost.label}</p>
-              <p className="mt-4 text-base-300">{cost.body}</p>
+          {failures.map(({ icon: Icon, title, body }) => (
+            <RevealItem key={title} className="bg-base-950 p-8">
+              <Icon className="size-5 text-brass-400" strokeWidth={1.75} />
+              <h3 className="mt-4 text-lg font-medium text-base-100">{title}</h3>
+              <p className="mt-3 leading-relaxed text-base-400">{body}</p>
             </RevealItem>
           ))}
         </RevealGroup>
+
+        <Reveal delay={0.1} className="mt-10">
+          <p className="max-w-2xl text-base-400">
+            None of these are model problems. They are ownership problems, which is why we
+            price the maintenance, not the software.
+          </p>
+        </Reveal>
       </div>
     </section>
   );

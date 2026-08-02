@@ -18,7 +18,7 @@ export function Hero() {
             <span className="rounded-full bg-brass-400 px-2.5 py-0.5 text-xs font-semibold text-base-950">
               Now
             </span>
-            Taking on 10 builds for Q1 2027
+            Onboarding our first cohort
           </a>
         </Reveal>
 

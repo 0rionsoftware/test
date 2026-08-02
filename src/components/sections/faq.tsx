@@ -30,7 +30,7 @@ const faqs: AccordionItem[] = [
   {
     question: "Why is there a waitlist?",
     answer:
-      "Because installs need senior attention and we would rather run ten builds properly than thirty badly. Slots open in batches. Joining costs you nothing and gets you the process teardown offer first.",
+      "Because installs need senior attention, and we would rather run a handful of builds properly than a pile of them badly. Slots open in batches. Joining costs you nothing and gets you the teardown offer first.",
   },
 ];
 
