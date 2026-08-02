@@ -10,7 +10,7 @@ export function Logo({ className }: { className?: string }) {
       viewBox="0 0 32 32"
       fill="none"
       aria-hidden
-      className={cn("text-brass-400", className)}
+      className={cn("text-accent", className)}
     >
       <rect
         x="1.5"

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { brand } from "@/lib/brand";
 
 /**
  * Live signup count for social proof. Renders nothing until the count is
@@ -26,7 +27,7 @@ export function WaitlistCount({ threshold = 25 }: { threshold?: number }) {
 
   if (count === null || count < threshold) {
     return (
-      <p className="text-sm text-base-400">
+      <p className="text-sm text-content-muted">
         Fixed-scope builds. Flat monthly maintenance. No per-seat pricing.
       </p>
     );
@@ -35,16 +36,21 @@ export function WaitlistCount({ threshold = 25 }: { threshold?: number }) {
   return (
     <div className="flex items-center gap-3">
       <div className="flex -space-x-2" aria-hidden>
-        {["#d99425", "#7d8791", "#363d44", "#b47818"].map((color) => (
+        {[
+          brand.accentStrong,
+          brand.contentMuted,
+          brand.borderStrong,
+          brand.accentDeep,
+        ].map((color) => (
           <span
             key={color}
-            className="size-7 rounded-full border-2 border-base-950"
+            className="size-7 rounded-full border-2 border-canvas"
             style={{ backgroundColor: color }}
           />
         ))}
       </div>
-      <p className="text-sm text-base-400">
-        <NumberTicker value={count} className="font-medium text-base-100" /> teams on the
+      <p className="text-sm text-content-muted">
+        <NumberTicker value={count} className="font-medium text-content" /> teams on the
         waitlist
       </p>
     </div>

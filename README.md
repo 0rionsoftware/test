@@ -153,6 +153,34 @@ Each is a self-contained file consuming only `cn` and `motion`, so swapping one 
 real Skiper equivalent is a per-file replacement — nothing else needs to change. Verify
 the registry URL against the current Skiper docs before your first `add`.
 
+## Design system
+
+Two token layers in `src/app/globals.css`:
+
+- **Primitives** — the raw ramps (`--color-base-*`, `--color-brass-*`). Components never
+  reference these.
+- **Semantics** — what a thing *is*: `canvas`, `surface`, `border`, `content`,
+  `content-muted`, `accent`, `danger`, `success`, `focus-ring`. Components use only
+  these, so a rebrand is an edit to one file.
+
+Also tokenised: fluid type (`text-display`, `text-title`, `text-title-lg`,
+`text-eyebrow`), section rhythm (`py-section`, `py-section-lg`), and the page gutter
+(`container-page`, `px-gutter`).
+
+Two rules worth keeping:
+
+1. **No colour literal outside `globals.css` and `src/lib/brand.ts`.** `brand.ts` exists
+   only for `next/og` and the theme-colour meta tag, which cannot read CSS. The two files
+   mirror each other — change one, change the other.
+2. **New `--text-*` or `--color-*` tokens must be registered in `src/lib/utils.ts`.**
+   tailwind-merge classifies unknown classes by prefix, so it cannot tell `text-display`
+   (a size) from `text-content` (a colour) and will silently drop one when both go
+   through `cn()`. That is a real bug this codebase has already hit.
+
+Every interactive element carries the `focus-ring` utility rather than its own
+`focus-visible:` chain, so keyboard focus is consistent and cannot be forgotten on a new
+control.
+
 ## Security posture
 
 What's in place, and what is deliberately left to you:

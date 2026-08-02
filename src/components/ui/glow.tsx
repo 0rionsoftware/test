@@ -7,7 +7,7 @@ export function Glow({ className }: { className?: string }) {
       aria-hidden
       className={cn(
         "pointer-events-none absolute rounded-full blur-[120px] animate-drift",
-        "bg-brass-500/20",
+        "bg-accent-strong/20",
         className,
       )}
     />
@@ -20,7 +20,7 @@ export function HairlineRule({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "h-px w-full bg-gradient-to-r from-transparent via-base-700 to-transparent",
+        "h-px w-full bg-gradient-to-r from-transparent via-border-strong to-transparent",
         className,
       )}
     />

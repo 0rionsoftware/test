@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 
+import { accentAlpha, brand } from "@/lib/brand";
 import { site } from "@/lib/site";
 
 export const alt = `${site.name} — ${site.tagline}`;
@@ -16,9 +17,9 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#08090a",
+          backgroundColor: brand.canvas,
           backgroundImage:
-            "radial-gradient(900px circle at 50% -10%, rgba(232,168,61,0.18), transparent 60%)",
+            `radial-gradient(900px circle at 50% -10%, ${accentAlpha(0.18)}, transparent 60%)`,
           padding: 72,
         }}
       >
@@ -28,7 +29,7 @@ export default function OpengraphImage() {
               width: 44,
               height: 44,
               borderRadius: 12,
-              border: "2px solid #e8a83d",
+              border: `2px solid ${brand.accent}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -39,11 +40,11 @@ export default function OpengraphImage() {
                 width: 16,
                 height: 16,
                 borderRadius: 999,
-                border: "3px solid #e8a83d",
+                border: `3px solid ${brand.accent}`,
               }}
             />
           </div>
-          <div style={{ fontSize: 32, color: "#e9edf1", fontWeight: 600 }}>
+          <div style={{ fontSize: 32, color: brand.content, fontWeight: 600 }}>
             {site.name}
           </div>
         </div>
@@ -53,7 +54,7 @@ export default function OpengraphImage() {
             style={{
               fontSize: 68,
               lineHeight: 1.1,
-              color: "#e9edf1",
+              color: brand.content,
               fontWeight: 600,
               letterSpacing: "-0.03em",
               maxWidth: 900,
@@ -61,7 +62,7 @@ export default function OpengraphImage() {
           >
             Your team is the integration layer. Let&apos;s fix that.
           </div>
-          <div style={{ fontSize: 28, color: "#7d8791", maxWidth: 820 }}>
+          <div style={{ fontSize: 28, color: brand.contentMuted, maxWidth: 820 }}>
             AI automation — scoped, installed, and maintained.
           </div>
         </div>
@@ -70,7 +71,7 @@ export default function OpengraphImage() {
           style={{
             display: "flex",
             fontSize: 24,
-            color: "#e8a83d",
+            color: brand.accent,
             letterSpacing: "0.08em",
           }}
         >

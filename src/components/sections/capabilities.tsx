@@ -47,17 +47,17 @@ export function Capabilities() {
   return (
     <section
       id="work"
-      className="scroll-mt-20 border-t border-base-800/70 py-24 sm:py-32"
+      className="scroll-mt-20 border-t border-border/70 py-section sm:py-section-lg"
     >
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="container-page">
         <Reveal className="max-w-2xl">
-          <p className="font-mono text-xs tracking-[0.2em] text-brass-400 uppercase">
+          <p className="font-mono text-eyebrow text-accent uppercase">
             What we automate
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-balance text-base-100 sm:text-4xl">
+          <h2 className="mt-4 text-title font-semibold text-balance text-content">
             The unglamorous work that eats your week.
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-base-400">
+          <p className="mt-5 text-lg leading-relaxed text-content-muted">
             We are not building you a chatbot. We are removing the six recurring tasks
             that quietly consume a third of your team&apos;s capacity.
           </p>
@@ -67,9 +67,9 @@ export function Capabilities() {
           {capabilities.map(({ icon: Icon, title, body }) => (
             <RevealItem key={title}>
               <SpotlightCard className="h-full">
-                <Icon className="size-5 text-brass-400" strokeWidth={1.75} />
-                <h3 className="mt-4 font-medium text-base-100">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-base-400">{body}</p>
+                <Icon className="size-5 text-accent" strokeWidth={1.75} />
+                <h3 className="mt-4 font-medium text-content">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-content-muted">{body}</p>
               </SpotlightCard>
             </RevealItem>
           ))}

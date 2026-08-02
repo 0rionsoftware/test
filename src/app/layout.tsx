@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
+import { brand } from "@/lib/brand";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -54,7 +55,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08090a",
+  themeColor: brand.canvas,
   colorScheme: "dark",
 };
 
@@ -81,7 +82,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <a
           href="#top"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-brass-400 focus:px-4 focus:py-2 focus:font-medium focus:text-base-950"
+          className="focus-ring sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:font-medium focus:text-accent-contrast"
         >
           Skip to content
         </a>

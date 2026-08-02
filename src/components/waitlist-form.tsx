@@ -71,6 +71,8 @@ export function WaitlistForm({
     }
   }
 
+  const isLoading = status === "loading";
+
   return (
     <div className={cn("w-full", className)}>
       <AnimatePresence mode="wait" initial={false}>
@@ -82,14 +84,14 @@ export function WaitlistForm({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             role="status"
-            className="flex items-center gap-3 rounded-lg border border-brass-500/40 bg-brass-500/10 px-4 py-4"
+            className="flex items-center gap-3 rounded-lg border border-accent-strong/40 bg-accent-strong/10 px-4 py-4"
           >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brass-400 text-base-950">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-success text-accent-contrast">
               <Check className="size-4" strokeWidth={3} />
             </span>
             <div className="text-left">
-              <p className="text-sm font-medium text-base-100">{message}</p>
-              <p className="text-sm text-base-400">
+              <p className="text-sm font-medium text-content">{message}</p>
+              <p className="text-sm text-content-muted">
                 {position
                   ? `You're #${position} in the queue. Check your inbox for what happens next.`
                   : "Check your inbox for what happens next."}
@@ -118,12 +120,7 @@ export function WaitlistForm({
               />
             </div>
 
-            <div
-              className={cn(
-                "flex flex-col gap-3",
-                size === "lg" ? "sm:flex-row" : "sm:flex-row",
-              )}
-            >
+            <div className="flex flex-col gap-3 sm:flex-row">
               <div className="relative flex-1">
                 <label htmlFor={`email-${source}`} className="sr-only">
                   Work email
@@ -138,29 +135,40 @@ export function WaitlistForm({
                   aria-invalid={status === "error"}
                   aria-describedby={status === "error" ? `error-${source}` : undefined}
                   className={cn(
-                    "w-full rounded-lg border bg-base-900/80 px-4 text-base-100 outline-none",
-                    "placeholder:text-base-500",
+                    "w-full rounded-lg border bg-surface/80 px-4 text-content outline-none",
+                    "placeholder:text-content-subtle",
                     "transition-colors duration-200",
-                    "focus:border-brass-500 focus:ring-2 focus:ring-brass-500/25",
+                    // Distinct rest / hover / focus, and an invalid state that
+                    // survives focus instead of being overridden by it.
+                    "border-border-strong",
+                    "hover:border-border-hover",
+                    "focus:border-accent-strong focus:ring-2 focus:ring-accent-strong/25",
+                    "aria-invalid:border-danger-border",
+                    "aria-invalid:focus:border-danger aria-invalid:focus:ring-danger/25",
                     size === "lg" ? "h-13 text-base" : "h-11 text-sm",
-                    status === "error" ? "border-red-500/60" : "border-base-700",
                   )}
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={status === "loading"}
+                disabled={isLoading}
+                aria-busy={isLoading}
                 className={cn(
-                  "group inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-6 font-medium",
-                  "bg-brass-400 text-base-950",
-                  "transition-all duration-200 hover:bg-brass-300",
-                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-400",
-                  "disabled:cursor-not-allowed disabled:opacity-70",
+                  "focus-ring group inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 font-medium",
+                  "bg-accent text-accent-contrast",
+                  // Scoped rather than `transition-all`, which would animate
+                  // the focus outline too and delay the ring appearing.
+                  "transition-[background-color,transform] duration-200",
+                  // Gate hover and press on enabled, so a submitting button
+                  // does not keep responding to the pointer.
+                  "cursor-pointer enabled:hover:bg-accent-hover",
+                  "enabled:active:bg-accent-active enabled:active:scale-[0.98]",
+                  "disabled:cursor-wait disabled:bg-accent/60",
                   size === "lg" ? "h-13 text-base" : "h-11 text-sm",
                 )}
               >
-                {status === "loading" ? (
+                {isLoading ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
                     Joining
@@ -182,7 +190,7 @@ export function WaitlistForm({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="pt-2 text-sm text-red-400"
+                  className="pt-2 text-sm text-danger"
                 >
                   {message}
                 </motion.p>

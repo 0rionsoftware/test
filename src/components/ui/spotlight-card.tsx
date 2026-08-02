@@ -3,6 +3,7 @@
 import { motion, useMotionTemplate, useMotionValue } from "motion/react";
 import type { MouseEvent, ReactNode } from "react";
 
+import { accentAlpha } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 /**
@@ -25,14 +26,14 @@ export function SpotlightCard({
     mouseY.set(clientY - top);
   }
 
-  const background = useMotionTemplate`radial-gradient(240px circle at ${mouseX}px ${mouseY}px, rgba(232,168,61,0.14), transparent 70%)`;
+  const background = useMotionTemplate`radial-gradient(240px circle at ${mouseX}px ${mouseY}px, ${accentAlpha(0.14)}, transparent 70%)`;
 
   return (
     <div
       onMouseMove={handleMouseMove}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-base-800 bg-base-900/60 p-6",
-        "transition-colors duration-300 hover:border-base-700",
+        "group relative overflow-hidden rounded-xl border border-border bg-surface/60 p-6",
+        "transition-colors duration-300 hover:border-border-strong",
         className,
       )}
     >

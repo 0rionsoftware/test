@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 
+import { brand } from "@/lib/brand";
+
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
@@ -14,7 +16,7 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#08090a",
+          backgroundColor: brand.canvas,
           borderRadius: 7,
         }}
       >
@@ -23,7 +25,7 @@ export default function Icon() {
             width: 17,
             height: 17,
             borderRadius: 999,
-            border: "3px solid #e8a83d",
+            border: `3px solid ${brand.accent}`,
           }}
         />
       </div>

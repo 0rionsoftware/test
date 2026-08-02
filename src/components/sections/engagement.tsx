@@ -56,17 +56,17 @@ export function Engagement() {
   return (
     <section
       id="pricing"
-      className="scroll-mt-20 border-t border-base-800/70 py-24 sm:py-32"
+      className="scroll-mt-20 border-t border-border/70 py-section sm:py-section-lg"
     >
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="container-page">
         <Reveal className="max-w-2xl">
-          <p className="font-mono text-xs tracking-[0.2em] text-brass-400 uppercase">
+          <p className="font-mono text-eyebrow text-accent uppercase">
             Engagement
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-balance text-base-100 sm:text-4xl">
+          <h2 className="mt-4 text-title font-semibold text-balance text-content">
             Priced like a build, not a subscription.
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-base-400">
+          <p className="mt-5 text-lg leading-relaxed text-content-muted">
             You are buying an outcome and someone to own it. No seats, no usage meter, no
             surprise invoice when volume grows. Every number is quoted from the teardown,
             in writing, before work starts.
@@ -79,31 +79,31 @@ export function Engagement() {
               <div
                 className={
                   stage.featured
-                    ? "h-full rounded-xl border border-brass-500/40 bg-gradient-to-b from-brass-500/[0.07] to-transparent p-8"
-                    : "h-full rounded-xl border border-base-800 bg-base-900/40 p-8"
+                    ? "h-full rounded-xl border border-border-accent/40 bg-gradient-to-b from-accent-strong/[0.07] to-transparent p-8"
+                    : "h-full rounded-xl border border-border bg-surface/40 p-8"
                 }
               >
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-medium text-base-100">{stage.name}</h3>
-                  <span className="font-mono text-xs tracking-wider text-base-400 uppercase">
+                  <h3 className="font-medium text-content">{stage.name}</h3>
+                  <span className="font-mono text-xs tracking-wider text-content-muted uppercase">
                     {`0${i + 1}`}
                   </span>
                 </div>
 
                 <p className="mt-6 flex flex-wrap items-baseline gap-x-2">
-                  <span className="text-2xl font-semibold tracking-tight text-base-100">
+                  <span className="text-2xl font-semibold tracking-tight text-content">
                     {stage.shape}
                   </span>
-                  <span className="text-sm text-base-400">{stage.cadence}</span>
+                  <span className="text-sm text-content-muted">{stage.cadence}</span>
                 </p>
 
-                <p className="mt-4 text-sm leading-relaxed text-base-400">{stage.body}</p>
+                <p className="mt-4 text-sm leading-relaxed text-content-muted">{stage.body}</p>
 
-                <ul className="mt-6 space-y-3 border-t border-base-800 pt-6">
+                <ul className="mt-6 space-y-3 border-t border-border pt-6">
                   {stage.features.map((feature) => (
-                    <li key={feature} className="flex gap-3 text-sm text-base-300">
+                    <li key={feature} className="flex gap-3 text-sm text-content-body">
                       <Check
-                        className="mt-0.5 size-4 shrink-0 text-brass-400"
+                        className="mt-0.5 size-4 shrink-0 text-accent"
                         strokeWidth={2.5}
                       />
                       {feature}
@@ -116,7 +116,7 @@ export function Engagement() {
         </div>
 
         <Reveal delay={0.1} className="mx-auto mt-14 max-w-xl text-center">
-          <p className="mb-4 text-base-400">
+          <p className="mb-4 text-content-muted">
             Build slots are limited. Join the list to get first refusal on one.
           </p>
           <WaitlistForm source="pricing" size="sm" />

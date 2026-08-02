@@ -132,12 +132,19 @@ export function TextReveal({
       }}
     >
       {words.map((word, i) => (
-        <span key={`${word}-${i}`} className="inline-block overflow-hidden pb-[0.12em]">
+        // The clip is what makes the slide-up read as a reveal, but it also
+        // cuts descenders. Pad the box and pull the same amount back off the
+        // margin, so glyphs clear the edge without changing the line's
+        // vertical rhythm.
+        <span
+          key={`${word}-${i}`}
+          className="inline-block overflow-hidden pb-[0.2em] -mb-[0.2em]"
+        >
           <motion.span
             className={cn(
               "inline-block",
               highlighted.has(word.toLowerCase().replace(/[^a-z]/g, "")) &&
-                "text-brass-400",
+                "text-accent",
             )}
             variants={{
               hidden: { y: "110%", opacity: 0 },

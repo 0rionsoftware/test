@@ -22,34 +22,34 @@ const failures = [
 
 export function Problem() {
   return (
-    <section className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+    <section className="py-section sm:py-section-lg">
+      <div className="container-page">
         <Reveal className="max-w-2xl">
-          <p className="font-mono text-xs tracking-[0.2em] text-brass-400 uppercase">
+          <p className="font-mono text-eyebrow text-accent uppercase">
             The gap
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-balance text-base-100 sm:text-4xl">
+          <h2 className="mt-4 text-title font-semibold text-balance text-content">
             Buying AI software is easy. Getting it to run your actual operation is not.
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-base-400">
+          <p className="mt-5 text-lg leading-relaxed text-content-muted">
             Every tool assumes a clean process, tidy data, and someone in-house to
             maintain it. Real operations have none of those. That gap is where automation
             projects go to die — and it is the only thing we work on.
           </p>
         </Reveal>
 
-        <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-xl border border-base-800 bg-base-800 sm:grid-cols-3">
+        <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-xl border border-border bg-surface-inset sm:grid-cols-3">
           {failures.map(({ icon: Icon, title, body }) => (
-            <RevealItem key={title} className="bg-base-950 p-8">
-              <Icon className="size-5 text-brass-400" strokeWidth={1.75} />
-              <h3 className="mt-4 text-lg font-medium text-base-100">{title}</h3>
-              <p className="mt-3 leading-relaxed text-base-400">{body}</p>
+            <RevealItem key={title} className="bg-canvas p-8">
+              <Icon className="size-5 text-accent" strokeWidth={1.75} />
+              <h3 className="mt-4 text-lg font-medium text-content">{title}</h3>
+              <p className="mt-3 leading-relaxed text-content-muted">{body}</p>
             </RevealItem>
           ))}
         </RevealGroup>
 
         <Reveal delay={0.1} className="mt-10">
-          <p className="max-w-2xl text-base-400">
+          <p className="max-w-2xl text-content-muted">
             None of these are model problems. They are ownership problems, which is why we
             price the maintenance, not the software.
           </p>

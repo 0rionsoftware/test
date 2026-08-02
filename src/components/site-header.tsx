@@ -27,14 +27,18 @@ export function SiteHeader() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled
-          ? "border-b border-base-800/80 bg-base-950/80 backdrop-blur-xl"
+          ? "border-b border-border/80 bg-canvas/80 backdrop-blur-xl"
           : "border-b border-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <a href="#top" className="flex items-center gap-2.5" aria-label="Millwright home">
+      <div className="container-page flex h-16 items-center justify-between">
+        <a
+          href="#top"
+          className="focus-ring flex items-center gap-2.5 rounded-md"
+          aria-label="Millwright home"
+        >
           <Logo className="size-7" />
-          <span className="text-[15px] font-semibold tracking-tight text-base-100">
+          <span className="text-[15px] font-semibold tracking-tight text-content">
             Millwright
           </span>
         </a>
@@ -44,7 +48,10 @@ export function SiteHeader() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-base-400 transition-colors hover:text-base-100"
+              className={cn(
+                "focus-ring rounded-md text-sm text-content-muted transition-colors",
+                "hover:text-content active:text-content-body",
+              )}
             >
               {link.label}
             </a>
@@ -53,7 +60,11 @@ export function SiteHeader() {
 
         <a
           href="#waitlist"
-          className="rounded-lg border border-base-700 bg-base-900 px-4 py-2 text-sm font-medium text-base-100 transition-colors hover:border-brass-500/60 hover:bg-base-850"
+          className={cn(
+            "focus-ring rounded-lg border border-border-strong bg-surface px-4 py-2 text-sm font-medium text-content",
+            "transition-colors hover:border-border-accent hover:bg-surface-raised",
+            "active:bg-surface-inset",
+          )}
         >
           Request access
         </a>

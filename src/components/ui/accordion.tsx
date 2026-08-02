@@ -22,7 +22,7 @@ export function Accordion({
   const baseId = useId();
 
   return (
-    <div className={cn("divide-y divide-base-800 border-y border-base-800", className)}>
+    <div className={cn("divide-y divide-border border-y border-border", className)}>
       {items.map((item, i) => {
         const isOpen = open === i;
         const panelId = `${baseId}-panel-${i}`;
@@ -37,16 +37,22 @@ export function Accordion({
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex w-full cursor-pointer items-center justify-between gap-6 py-5 text-left transition-colors hover:text-base-100"
+                className={cn(
+                  "focus-ring flex w-full cursor-pointer items-center justify-between gap-6 rounded-md px-1 py-5 text-left",
+                  "transition-colors",
+                  // Rest, hover, keyboard focus and open are each distinct.
+                  "hover:bg-surface/60",
+                  isOpen && "text-content",
+                )}
               >
-                <span className="text-base font-medium text-base-100 sm:text-lg">
+                <span className="text-base font-medium text-content sm:text-lg">
                   {item.question}
                 </span>
                 <motion.span
                   aria-hidden
                   animate={{ rotate: isOpen ? 45 : 0 }}
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="shrink-0 text-brass-400"
+                  className="shrink-0 text-accent"
                 >
                   <Plus className="size-5" />
                 </motion.span>
@@ -65,7 +71,7 @@ export function Accordion({
                   transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden"
                 >
-                  <p className="max-w-2xl pb-6 text-base-400">{item.answer}</p>
+                  <p className="max-w-2xl px-1 pb-6 text-content-muted">{item.answer}</p>
                 </motion.div>
               )}
             </AnimatePresence>

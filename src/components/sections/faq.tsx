@@ -36,13 +36,13 @@ const faqs: AccordionItem[] = [
 
 export function Faq() {
   return (
-    <section id="faq" className="scroll-mt-20 border-t border-base-800/70 py-24 sm:py-32">
-      <div className="mx-auto max-w-3xl px-6">
+    <section id="faq" className="scroll-mt-20 border-t border-border/70 py-section sm:py-section-lg">
+      <div className="mx-auto max-w-3xl px-gutter">
         <Reveal>
-          <p className="font-mono text-xs tracking-[0.2em] text-brass-400 uppercase">
+          <p className="font-mono text-eyebrow text-accent uppercase">
             FAQ
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-balance text-base-100 sm:text-4xl">
+          <h2 className="mt-4 text-title font-semibold text-balance text-content">
             The questions we get asked first.
           </h2>
         </Reveal>
