@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --color-base-950: #08090a;
+  --color-base-900: #0d0f11;
+  --color-base-850: #121517;
+  --color-base-800: #191d20;
+  --color-base-700: #24292e;
+  --color-base-600: #363d44;
+  --color-base-500: #626c76;
+  --color-base-400: #8b959f;
+  --color-base-300: #a4adb6;
+  --color-base-200: #ccd3d9;
+  --color-base-100: #e9edf1;
+
+  --color-brass-600: #b47818;
+  --color-brass-500: #d99425;
+  --color-brass-400: #e8a83d;
+  --color-brass-300: #f0c273;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-drift: drift 14s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes drift {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: translate3d(0, -18px, 0) scale(1.06);
+    }
+  }
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-base-950);
+  color: var(--color-base-200);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--color-brass-400);
+  color: var(--color-base-950);
+}
+
+/* Machined hairline grid used behind the hero and CTA. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.mask-fade-edges {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+}
+
+.mask-fade-bottom {
+  mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
