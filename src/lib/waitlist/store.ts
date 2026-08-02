@@ -88,8 +88,8 @@ class PostgresStore implements WaitlistStore {
 
 /**
  * Development fallback. Writes to a gitignored JSON file so `npm run dev`
- * works with zero configuration. Not safe for serverless deploys — the
- * filesystem is ephemeral and per-instance — hence the startup warning.
+ * works with zero configuration. Never selected in production — see
+ * `getStore()`, which throws rather than let this lose real signups.
  */
 class FileStore implements WaitlistStore {
   private file = path.join(process.cwd(), ".data", "waitlist.json");
