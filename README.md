@@ -67,9 +67,20 @@ number at all. Below the threshold it falls back to a positioning line.
 ### 1. Set a database
 
 **Required — the waitlist is inert without it.** Set `DATABASE_URL` to any Postgres
-connection string (Neon, Supabase, Vercel Postgres, RDS, self-hosted) and the app
-switches over automatically. The `waitlist` table is created on first write, so there is
-no migration step.
+connection string (Neon, Supabase, Vercel Postgres, RDS, self-hosted), then apply the
+schema once:
+
+```bash
+psql "$DATABASE_URL" -f migrations/001_waitlist.sql
+```
+
+Point `DATABASE_URL` at a role with `SELECT, INSERT` on `waitlist` and nothing else —
+the grants are at the bottom of that migration file. The app never needs `UPDATE`,
+`DELETE`, or `CREATE`, so a leaked connection string cannot erase or reshape your list.
+
+For throwaway environments, `WAITLIST_AUTO_MIGRATE=1` lets the app create the table
+itself, at the cost of requiring DDL rights permanently. It is on by default in
+development and off in production.
 
 The local JSON file store is a development convenience only. On serverless the
 filesystem is ephemeral and per-instance, so using it in production would accept a
@@ -141,6 +152,43 @@ idiom as a stand-in:
 Each is a self-contained file consuming only `cn` and `motion`, so swapping one for the
 real Skiper equivalent is a per-file replacement — nothing else needs to change. Verify
 the registry URL against the current Skiper docs before your first `add`.
+
+## Security posture
+
+What's in place, and what is deliberately left to you:
+
+- **Secrets** never reach the client. `DATABASE_URL` and `RESEND_API_KEY` are read at
+  runtime in server-only modules; only `NEXT_PUBLIC_*` is exposed. Verified by building
+  with canary values and grepping `.next/static` and the build log.
+- **SQL** goes through `postgres.js` tagged templates, so every value is parameterised.
+  There is no string-built SQL anywhere.
+- **Database role** should be least-privilege — see [Set a database](#1-set-a-database).
+- **Validation** is server-side (zod) with length caps on every field. The client's
+  `required` and `type="email"` are UX only.
+- **Request bodies** over 16 KB are rejected before parsing, by `Content-Length` and
+  again by actual length so a chunked body cannot slip past.
+- **Rate limiting** is 5 requests per IP per minute on signup, and on the uncached path
+  of the count endpoint. The limiter is in-memory and therefore per-instance; move it to
+  Upstash or Redis if you need a hard global bound.
+- **The count endpoint** is cached for 60s and invalidated on new signups, so page loads
+  and scripted requests do not each cost a `COUNT(*)`.
+- **Errors** return generic messages to the client and log details server-side. Verified
+  that a bad connection string does not surface credentials in logs.
+- **Headers**: CSP, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`,
+  `Permissions-Policy`, HSTS. `X-Powered-By` is off. See `next.config.ts`.
+- **No auth, sessions, uploads, or admin routes** exist, so those attack surfaces are
+  absent rather than protected. The only way to read the list is direct database access.
+
+### Known trade-off: signup status is observable
+
+`POST /api/waitlist` returns `alreadyJoined` and a queue position, so someone can probe
+whether a specific address is on the list. Rate limiting slows bulk enumeration but does
+not prevent targeted checks — a competitor could test a list of known companies. It is
+kept because "you're already on the list" and "#42 in the queue" both help conversion.
+
+To close it, return a constant response from the signup handler regardless of outcome
+and move the real status into the welcome email, which only the address owner can read.
+That means dropping the queue position from the success state in `waitlist-form.tsx`.
 
 ## Accessibility and motion
 

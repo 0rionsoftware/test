@@ -3,10 +3,27 @@ import { NextResponse } from "next/server";
 import { sendWelcomeEmail } from "@/lib/waitlist/notify";
 import { clientKey, rateLimit, sweep } from "@/lib/waitlist/rate-limit";
 import { isDisposable, normalizeEmail, signupSchema } from "@/lib/waitlist/schema";
-import { getStore, NoDurableStoreError } from "@/lib/waitlist/store";
+import { getStore, MissingSchemaError, NoDurableStoreError } from "@/lib/waitlist/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/**
+ * The count is public and changes slowly, so serve it from memory. Without
+ * this, every page load — and every scripted request — costs a COUNT(*)
+ * against Postgres, which is free amplification for anyone hammering the
+ * endpoint.
+ */
+const COUNT_TTL_MS = 60_000;
+let countCache: { value: number; expiresAt: number } | null = null;
+
+/**
+ * Reject oversized bodies before `request.json()` buffers them into memory.
+ * A real signup is a few hundred bytes; without this cap the rate limiter
+ * still allows several very large payloads per IP per minute, which is free
+ * memory pressure on a serverless instance.
+ */
+const MAX_BODY_BYTES = 16 * 1024;
 
 export async function POST(request: Request) {
   sweep();
@@ -19,9 +36,19 @@ export async function POST(request: Request) {
     );
   }
 
+  const declaredLength = Number(request.headers.get("content-length") ?? 0);
+  if (declaredLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "Request body too large." }, { status: 413 });
+  }
+
   let payload: unknown;
   try {
-    payload = await request.json();
+    // Guard against a body that lies about (or omits) its Content-Length.
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: "Request body too large." }, { status: 413 });
+    }
+    payload = JSON.parse(raw);
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -60,11 +87,23 @@ export async function POST(request: Request) {
     });
 
     if (created) {
+      countCache = null;
       await sendWelcomeEmail(normalized, position);
     }
 
     return NextResponse.json({ ok: true, position, alreadyJoined: !created });
   } catch (error) {
+    if (error instanceof MissingSchemaError) {
+      console.error(`[waitlist] Signup rejected: ${error.message}`);
+      return NextResponse.json(
+        {
+          error:
+            "Our waitlist isn't accepting signups just yet. Email us and we'll add you by hand.",
+        },
+        { status: 503 },
+      );
+    }
+
     if (error instanceof NoDurableStoreError) {
       console.error(
         "[waitlist] Signup rejected: DATABASE_URL is not set on this deployment.",
@@ -86,12 +125,26 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const now = Date.now();
+  if (countCache && now < countCache.expiresAt) {
+    return NextResponse.json({ count: countCache.value });
+  }
+
+  // Only uncached requests can reach the database, so the limiter guards the
+  // expensive path rather than the cheap one.
+  sweep();
+  if (!rateLimit(`count:${clientKey(request.headers)}`).ok) {
+    return NextResponse.json({ count: countCache?.value ?? 0 });
+  }
+
   try {
-    return NextResponse.json({ count: await getStore().count() });
+    const value = await getStore().count();
+    countCache = { value, expiresAt: now + COUNT_TTL_MS };
+    return NextResponse.json({ count: value });
   } catch (error) {
-    // Includes the no-database case: report zero so the page renders its
-    // fallback copy instead of a broken social-proof number.
+    // Includes the no-database and missing-schema cases: report zero so the
+    // page renders its fallback copy instead of a broken social-proof number.
     console.error("[waitlist] Count failed:", error);
     return NextResponse.json({ count: 0 });
   }

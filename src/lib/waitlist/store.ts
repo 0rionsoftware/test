@@ -23,6 +23,42 @@ export interface WaitlistStore {
   count(): Promise<number>;
 }
 
+/** Postgres error code for "relation does not exist". */
+const UNDEFINED_TABLE = "42P01";
+
+/**
+ * Whether the store may issue DDL. Running `CREATE TABLE IF NOT EXISTS` on
+ * every cold start looks harmless, but Postgres checks CREATE privilege on the
+ * schema *before* the IF NOT EXISTS check — so leaving it on forces the
+ * application role to hold DDL rights permanently, and a leaked connection
+ * string could then create or alter objects. Default it off in production and
+ * apply `migrations/001_waitlist.sql` once instead.
+ */
+const autoMigrate =
+  process.env.WAITLIST_AUTO_MIGRATE === "1" || process.env.NODE_ENV !== "production";
+
+/** Thrown when the schema is absent and the store is not allowed to create it. */
+export class MissingSchemaError extends Error {
+  constructor() {
+    super(
+      "The waitlist table does not exist. Apply migrations/001_waitlist.sql, " +
+        "or set WAITLIST_AUTO_MIGRATE=1 to let the app create it (requires DDL rights).",
+    );
+    this.name = "MissingSchemaError";
+  }
+}
+
+function rethrow(error: unknown): never {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { code?: string }).code === UNDEFINED_TABLE
+  ) {
+    throw new MissingSchemaError();
+  }
+  throw error;
+}
+
 /**
  * Postgres-backed store. Works with any Postgres connection string
  * (Neon, Supabase, Vercel Postgres, RDS, self-hosted).
@@ -41,9 +77,13 @@ class PostgresStore implements WaitlistStore {
     });
   }
 
-  /** Lazily create the table so a fresh database works with no migration step. */
+  /**
+   * Creates the table only when explicitly permitted, so the production role
+   * can be restricted to SELECT/INSERT on this one table.
+   */
   private init() {
     this.ready ??= (async () => {
+      if (!autoMigrate) return;
       await this.sql`
         CREATE TABLE IF NOT EXISTS waitlist (
           id          bigserial PRIMARY KEY,
@@ -61,28 +101,36 @@ class PostgresStore implements WaitlistStore {
 
   async add(entry: WaitlistEntry): Promise<SignupResult> {
     await this.init();
-    const rows = await this.sql<{ inserted: boolean }[]>`
-      INSERT INTO waitlist (email, company, use_case, source, referrer)
-      VALUES (${entry.email}, ${entry.company}, ${entry.useCase}, ${entry.source}, ${entry.referrer})
-      ON CONFLICT (email) DO NOTHING
-      RETURNING true AS inserted
-    `;
-    const created = rows.length > 0;
+    try {
+      const rows = await this.sql<{ inserted: boolean }[]>`
+        INSERT INTO waitlist (email, company, use_case, source, referrer)
+        VALUES (${entry.email}, ${entry.company}, ${entry.useCase}, ${entry.source}, ${entry.referrer})
+        ON CONFLICT (email) DO NOTHING
+        RETURNING true AS inserted
+      `;
+      const created = rows.length > 0;
 
-    const [{ position }] = await this.sql<{ position: number }[]>`
-      SELECT COUNT(*)::int AS position FROM waitlist
-      WHERE created_at <= (SELECT created_at FROM waitlist WHERE email = ${entry.email})
-    `;
+      const [{ position }] = await this.sql<{ position: number }[]>`
+        SELECT COUNT(*)::int AS position FROM waitlist
+        WHERE created_at <= (SELECT created_at FROM waitlist WHERE email = ${entry.email})
+      `;
 
-    return { created, position };
+      return { created, position };
+    } catch (error) {
+      rethrow(error);
+    }
   }
 
   async count(): Promise<number> {
     await this.init();
-    const [{ count }] = await this.sql<{ count: number }[]>`
-      SELECT COUNT(*)::int AS count FROM waitlist
-    `;
-    return count;
+    try {
+      const [{ count }] = await this.sql<{ count: number }[]>`
+        SELECT COUNT(*)::int AS count FROM waitlist
+      `;
+      return count;
+    } catch (error) {
+      rethrow(error);
+    }
   }
 }
 
